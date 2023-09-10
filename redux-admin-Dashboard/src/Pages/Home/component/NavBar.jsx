@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const NavBar = () => {
@@ -11,6 +10,7 @@ const NavBar = () => {
                 <ul className="menu menu-horizontal px-1">
                     <li><Link to="/">Home</Link></li>
                     <li><Link to="/dashboard">Dashboard</Link></li>
+                    <li><Link to="/reading-history">Reading History</Link></li>
                 </ul>
             </div>
         </div>

@@ -1,9 +1,9 @@
-import React from 'react';
+import SideNav from "./component/SideNav";
 
 const Dashboard = () => {
     return (
         <div>
-            This is Dashboard
+            <SideNav></SideNav>
         </div>
     );
 };
