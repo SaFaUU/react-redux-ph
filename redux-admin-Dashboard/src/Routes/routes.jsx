@@ -4,6 +4,7 @@ import Dashboard from "../Pages/Dashboard/Dashboard";
 import Main from "../Pages/Layout/main";
 import ReadingHistory from "../Pages/ReadingHistory/ReadingHistory";
 import CreateBlog from "../Pages/CreateBlog/CreateBlog";
+import AllPost from "../Pages/AllPost/AllPost";
 
 export const routes = createBrowserRouter([
     {
@@ -25,7 +26,11 @@ export const routes = createBrowserRouter([
                     {
                         path: "create-post",
                         element: <CreateBlog></CreateBlog>
-                    }
+                    },
+                    {
+                        path: "all-post",
+                        element: <AllPost></AllPost>
+                    },
                 ]
             },
             {

@@ -11,7 +11,7 @@ const CreateBlog = () => {
     const contentInputRef = useRef(null);
     const imageInputRef = useRef(null);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Validate form data here if needed
@@ -20,7 +20,24 @@ const CreateBlog = () => {
         // You can now submit the data or perform other actions as needed
         console.log('Submitted Data:', { title, content, image });
 
+        fetch("http://localhost:5000/create-post", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                title,
+                content,
+                image,
+                time: new Date()
+
+            }),
+        })
+            .then(res => res.json())
+            .then(data => console.log(data))
+
         // Clear form inputs
+
         setFormData({
             title: '',
             content: '',
@@ -45,7 +62,6 @@ const CreateBlog = () => {
             <div className="bg-white p-8 rounded-lg shadow-md w-4/6">
                 <h1 className="text-2xl font-semibold mb-4">Create a New Blog Article</h1>
                 <form onSubmit={handleSubmit}>
-                    {/* Title Input */}
                     <div className="mb-4">
                         <label htmlFor="title" className="block text-gray-600">
                             Title
@@ -63,7 +79,6 @@ const CreateBlog = () => {
                         />
                     </div>
 
-                    {/* Content Textarea */}
                     <div className="mb-4">
                         <label htmlFor="content" className="block text-gray-600">
                             Content
@@ -81,7 +96,6 @@ const CreateBlog = () => {
                         />
                     </div>
 
-                    {/* Image Link Input */}
                     <div className="mb-6">
                         <label htmlFor="image" className="block text-gray-600">
                             Image Link
