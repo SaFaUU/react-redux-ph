@@ -1,7 +1,11 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { updateBlog } from "../../../Redux/actions/blogActions";
 
 const Modal = ({ modalBlog }) => {
     const [formData, setFormData] = useState({});
+    const dispatch = useDispatch();
     useEffect(() => {
         setFormData(modalBlog)
     }, [modalBlog])
@@ -20,21 +24,21 @@ const Modal = ({ modalBlog }) => {
         // You can now submit the data or perform other actions as needed
         console.log('Submitted Data:', { title, content, image });
 
-        fetch("http://localhost:5000/create-post", {
-            method: "POST",
+        fetch(`http://localhost:5000/update-blog/${modalBlog._id}`, {
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                title,
-                content,
-                image,
-                time: new Date()
-
-            }),
+            body: JSON.stringify(formData),
         })
             .then(res => res.json())
-            .then(data => console.log(data))
+            .then(data => {
+                console.log(data)
+                if (data.acknowledged) {
+                    document.getElementById('my_modal_1').close()
+                    dispatch(updateBlog(formData))
+                }
+            })
 
 
         // Focus on the first input (title) after submission
@@ -116,7 +120,6 @@ const Modal = ({ modalBlog }) => {
                                     Submit
                                 </button>
                                 <form method="dialog">
-
                                     <button className="btn font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Close</button>
                                 </form>
                             </div>

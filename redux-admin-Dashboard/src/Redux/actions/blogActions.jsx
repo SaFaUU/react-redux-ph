@@ -12,3 +12,24 @@ export const readBlog = (data) => {
         payload: data
     }
 }
+
+export const deleteBlog = (data) => {
+    return {
+        type: actionTypes.DELETE_CONTENT,
+        payload: data
+    }
+}
+
+export const updateBlog = (data) => {
+    return {
+        type: actionTypes.UPDATE_CONTENT,
+        payload: data
+    }
+}
+
+export const setSort = (data) => {
+    return {
+        type: actionTypes.SET_SORT,
+        payload: data
+    }
+}

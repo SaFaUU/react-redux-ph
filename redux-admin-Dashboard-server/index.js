@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = 5000
 
@@ -35,6 +35,25 @@ async function run() {
             const cursor = blogCollection.find({})
             const blogs = await cursor.toArray()
             res.send(blogs)
+        })
+        app.delete('/delete-blog/:id', async (req, res) => {
+            const id = req.params.id;
+            const response = await blogCollection.deleteOne({ _id: new ObjectId(id) })
+            res.send(response)
+        })
+        app.put('/update-blog/:id', async (req, res) => {
+            const id = req.params.id;
+            const post = req.body;
+            console.log(post);
+            const newPost = {
+                $set: {
+                    "title": post.title,
+                    "content": post.content,
+                    "image": post.image,
+                }
+            }
+            const response = await blogCollection.updateOne({ _id: new ObjectId(id) }, newPost, { upsert: true })
+            res.send(response)
         })
     }
     catch {

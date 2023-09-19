@@ -3,6 +3,7 @@ import { actionTypes } from "../actionTypes/actionTypes";
 const initialState = {
     blogs: [],
     readHistory: [],
+    sort: ""
 }
 
 const blogReducer = (state = initialState, action) => {
@@ -21,6 +22,21 @@ const blogReducer = (state = initialState, action) => {
                 }
             }
             return state;
+        case actionTypes.DELETE_CONTENT:
+            return {
+                ...state,
+                blogs: state.blogs.filter((blog) => blog._id !== action.payload._id)
+            }
+        case actionTypes.UPDATE_CONTENT:
+            return {
+                ...state,
+                blogs: state.blogs.map((blog) => blog._id === action.payload._id ? action.payload : blog)
+            }
+        case actionTypes.SET_SORT:
+            return {
+                ...state,
+                sort: action.payload
+            }
         default:
             return state
     }

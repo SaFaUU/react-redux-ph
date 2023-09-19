@@ -13,39 +13,42 @@ const CreateBlog = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        const genres = Array.from(checkboxes).map((checkbox) => checkbox.value);
 
+        console.log(genres);
         // Validate form data here if needed
-        const { title, content, image } = formData;
+        // const { title, content, image } = formData;
 
-        // You can now submit the data or perform other actions as needed
-        console.log('Submitted Data:', { title, content, image });
+        // // You can now submit the data or perform other actions as needed
+        // console.log('Submitted Data:', { title, content, image });
 
-        fetch("http://localhost:5000/create-post", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                title,
-                content,
-                image,
-                time: new Date()
+        // fetch("http://localhost:5000/create-post", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //         title,
+        //         content,
+        //         image,
+        //         time: new Date()
 
-            }),
-        })
-            .then(res => res.json())
-            .then(data => console.log(data))
+        //     }),
+        // })
+        //     .then(res => res.json())
+        //     .then(data => console.log(data))
 
-        // Clear form inputs
+        // // Clear form inputs
 
-        setFormData({
-            title: '',
-            content: '',
-            image: '',
-        });
+        // setFormData({
+        //     title: '',
+        //     content: '',
+        //     image: '',
+        // });
 
-        // Focus on the first input (title) after submission
-        titleInputRef.current.focus();
+        // // Focus on the first input (title) after submission
+        // titleInputRef.current.focus();
 
     };
 
@@ -111,9 +114,27 @@ const CreateBlog = () => {
                             ref={imageInputRef}
                         />
                     </div>
+                    <div className="flex space-x-5 justify-between">
+                        <label className="label cursor-pointer space-x-3">
+                            <span className="label-text">Thriller</span>
+                            <input type="checkbox" className="checkbox" value={"Thriller"} />
+                        </label>
+                        <label className="label cursor-pointer space-x-3">
+                            <span className="label-text">Psychology</span>
+                            <input type="checkbox" className="checkbox" value={"Psychology"} />
+                        </label>
+                        <label className="label cursor-pointer space-x-3">
+                            <span className="label-text">Science Fiction</span>
+                            <input type="checkbox" className="checkbox" value={"Science Fiction"} />
+                        </label>
+                        <label className="label cursor-pointer space-x-3">
+                            <span className="label-text">Slice of Life</span>
+                            <input type="checkbox" className="checkbox" value={"Slice of Life"} />
+                        </label>
+                    </div>
 
                     {/* Submit Button */}
-                    <div className="text-center">
+                    <div className="text-center mt-10">
                         <button
                             type="submit"
                             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-300 ease-in-out"

@@ -4,4 +4,5 @@ export const actionTypes = {
     UPDATE_CONTENT: "UPDATE_CONTENT",
     DELETE_CONTENT: "DELETE_CONTENT",
     READ_BLOG: "READ_BLOG",
+    SET_SORT: "SET_SORT",
 }
