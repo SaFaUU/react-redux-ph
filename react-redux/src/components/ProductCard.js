@@ -9,7 +9,6 @@ import { useLocation } from "react-router-dom";
 const ProductCard = ({ product }) => {
   const { pathname } = useLocation()
 
-  const dispatch = useDispatch()
 
   return (
     <div
