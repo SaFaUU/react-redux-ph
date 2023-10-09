@@ -1,9 +1,14 @@
 import React from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { FiTrash } from "react-icons/fi";
+import { usePostJobMutation } from "../../features/job/jobApi";
+import { useSelector } from "react-redux";
 
 const AddJob = () => {
   const { handleSubmit, register, control } = useForm();
+  const [postJob, { isLoading, isError }] = usePostJobMutation();
+  const { user } = useSelector((state) => state.auth)
+  console.log(user);
   const {
     fields: resFields,
     append: resAppend,
@@ -22,6 +27,11 @@ const AddJob = () => {
 
   const onSubmit = (data) => {
     console.log(data);
+    postJob({
+      ...data,
+      applicants: [],
+      queries: [],
+    })
   };
 
   return (
@@ -48,6 +58,7 @@ const AddJob = () => {
             className='cursor-not-allowed'
             type='text'
             id='companyName'
+            defaultValue={user.companyName}
             {...register("companyName")}
           />
         </div>

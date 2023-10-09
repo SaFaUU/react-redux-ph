@@ -7,7 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { googleLogin, loginUser } from "../features/auth/authSlice";
 import { toast } from "react-hot-toast";
 const Login = () => {
-  const { isLoading, email, isError, error } = useSelector((state) => state.auth);
+  const { isLoading, user, isError, error } = useSelector((state) => state.auth);
+  const { email } = user;
   const { register, handleSubmit, reset } = useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -67,13 +68,6 @@ const Login = () => {
                   Login
                 </button>
               </div>
-              <button
-                type='submit'
-                className='font-bold text-black py-3 rounded-full bg-secondary w-full'
-                onClick={handleGoogleLogin}
-              >
-                Login with Google
-              </button>
               <div>
                 <p>
                   Don't have an account?{" "}
@@ -87,6 +81,12 @@ const Login = () => {
               </div>
             </div>
           </form>
+          <button
+            className='font-bold text-black py-3 rounded-full bg-secondary w-full'
+            onClick={handleGoogleLogin}
+          >
+            Login with Google
+          </button>
         </div>
       </div>
     </div>
