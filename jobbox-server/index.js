@@ -49,7 +49,13 @@ const run = async () => {
 
       const filter = { _id: ObjectId(jobId) };
       const updateDoc = {
-        $push: { applicants: { id: ObjectId(userId), email } },
+        $push: {
+          applicants: {
+            id: ObjectId(userId),
+            email,
+            approvalStatus: "pending",
+          }
+        }, // pending, accepted, rejected
       };
 
       const result = await jobCollection.updateOne(filter, updateDoc);
@@ -91,8 +97,7 @@ const run = async () => {
     app.patch("/reply", async (req, res) => {
       const userId = req.body.userId;
       const reply = req.body.reply;
-      console.log(reply);
-      console.log(userId);
+
 
       const filter = { "queries.id": ObjectId(userId) };
 
@@ -120,17 +125,76 @@ const run = async () => {
     app.get("/applied-jobs/:email", async (req, res) => {
       const email = req.params.email;
       const query = { applicants: { $elemMatch: { email: email } } };
-      const cursor = jobCollection.find(query).project({ applicants: 0 });
+      const cursor = jobCollection.aggregate([
+        {
+          $match: query,
+        },
+        {
+          $unwind: "$applicants",
+        },
+        {
+          $match: {
+            "applicants.email": email,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            companyName: 1,
+            position: 1,
+            location: 1,
+            employmentType: 1,
+            approvalStatus: "$applicants.approvalStatus",
+          },
+        },
+      ]);
       const result = await cursor.toArray();
 
+      res.send({ status: true, data: result });
+    });
+
+    app.get("/posted-jobs/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { postedBy: email };
+      const cursor = jobCollection.find(query);
+      const result = await cursor.toArray();
       res.send({ status: true, data: result });
     });
 
     app.get("/jobs", async (req, res) => {
-      const cursor = jobCollection.find({});
+      const cursor = jobCollection.find({
+        jobOpen: true,
+      });
       const result = await cursor.toArray();
       res.send({ status: true, data: result });
     });
+    app.get("/applicants/:id", async (req, res) => {
+      const id = req.params.id;
+      const jobId = ObjectId(id);
+
+      const applicants = await jobCollection.aggregate([
+        { $match: { _id: jobId } },
+        { $unwind: "$applicants" },
+        {
+          $lookup: {
+            from: "user",
+            localField: "applicants.email",
+            foreignField: "email",
+            as: "applicants"
+          }
+        },
+        { $unwind: "$applicants" },
+        { $replaceRoot: { newRoot: "$applicants" } },
+      ]).toArray();
+
+
+      console.log(applicants);
+
+
+      res.send({ status: true, data: applicants });
+
+    });
+
 
     app.get("/job/:id", async (req, res) => {
       const id = req.params.id;
@@ -139,6 +203,31 @@ const run = async () => {
       res.send({ status: true, data: result });
     });
 
+    app.patch("/toggle-job-status", async (req, res) => {
+      const id = req.body._id;
+      const jobOpen = req.body.jobOpen;
+
+      const filter = { _id: ObjectId(id) };
+
+      const updateDoc = {
+        $set: {
+          jobOpen: jobOpen,
+        }
+      };
+
+      const result = await jobCollection.updateOne(
+        filter,
+        updateDoc,
+      );
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+
+
+    })
+
     app.post("/job", async (req, res) => {
       const job = req.body;
 
@@ -146,7 +235,70 @@ const run = async () => {
 
       res.send({ status: true, data: result });
     });
-  } finally {
+
+    app.get("/get-messages", async (req, res) => {
+      const jobId = req.query.jobId;
+      const employerId = req.query.employerId;
+      const candidateId = req.query.candidateId;
+      console.log(jobId, employerId, candidateId);
+
+      const result = await jobCollection.aggregate([
+        {
+          $match: {
+            _id: ObjectId(jobId),
+            'applicants.id': ObjectId(candidateId),
+          },
+        },
+        {
+          $unwind: '$applicants', // Unwind the array
+        },
+        {
+          $match: {
+            'applicants.id': ObjectId(candidateId),
+          },
+        },
+        {
+          $unwind: '$applicants.messages',
+        },
+        {
+          $project: {
+            _id: 0,
+            text: '$applicants.messages.text',
+            sender: '$applicants.messages.sender',
+          },
+        },
+      ]).toArray()
+      res.send({ status: true, data: result });
+    })
+
+    app.patch("/message", async (req, res) => {
+      const jobId = req.body.jobID;
+      const employerId = req.body.employerID;
+      const candidateId = req.body.candidateID;
+      const messages = req.body.messages;
+
+      const query = {
+        '_id': ObjectId(jobId),
+        'applicants.id': ObjectId(candidateId)
+      };
+
+      const update = {
+        $set: {
+          'applicants.$.messages': messages,
+          'applicants.$.employerId': employerId,
+        }
+      };
+
+      const result = await jobCollection.updateOne(query, update);
+
+      if (result.acknowledged) {
+        return res.send({ status: true, data: result });
+      }
+
+      res.send({ status: false });
+    });
+  }
+  finally {
   }
 };
 
